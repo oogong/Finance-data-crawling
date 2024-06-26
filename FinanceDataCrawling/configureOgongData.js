@@ -20,7 +20,7 @@ const currentYear = new Date().getFullYear();
 const bsnsYear = currentYear - 1;
 
 // 파일 경로
-const kospi200CodePath = './kospi200Code.json';
+const ogongCorpListPath = './ogongCorpList.json';
 
 // API 설정
 const apiUrl = 'https://opendart.fss.or.kr/api/fnlttSinglAcnt.json';
@@ -28,7 +28,7 @@ const apiKey = process.env.API_KEY;
 const reprtCode = '11011';
 
 // JSON 파일 읽기
-const kospi200Code = JSON.parse(fs.readFileSync(kospi200CodePath, 'utf-8'));
+const kospi200Code = JSON.parse(fs.readFileSync(ogongCorpListPath, 'utf-8'));
 
 // 비동기 함수로 API 요청 보내기
 async function fetchFinancialData() {
@@ -123,7 +123,7 @@ async function fetchFinancialData() {
   const parser = new Parser(opts);
   const csv = parser.parse(results);
 
-  fs.writeFile('financial_data.csv', csv, (err) => {
+  fs.writeFile('ogongData.csv', csv, (err) => {
     if (err) {
       console.error(`CSV 파일 저장 중 오류 발생: ${err.message}`);
     } else {
