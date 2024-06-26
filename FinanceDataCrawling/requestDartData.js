@@ -11,6 +11,8 @@ const { calculateROE } = require('./ratioService/ROE');
 const { calculateAssetTurnover } = require('./ratioService/AssetTurnover');
 const { calculateDebtTurnover } = require('./ratioService/DebtTurnover');
 const { calculateCapitalTurnover } = require('./ratioService/CapitalTurnover');
+const { logTransform } = require('./utils/logTransform');
+const { normalizeData } = require('./utils/normalizeData');
 require('dotenv').config();
 
 // 현재 연도를 가져와서 전년도로 설정
@@ -30,7 +32,7 @@ const kospi200Code = JSON.parse(fs.readFileSync(kospi200CodePath, 'utf-8'));
 
 // 비동기 함수로 API 요청 보내기
 async function fetchFinancialData() {
-  const results = [];
+  let results = [];
 
   for (const company of kospi200Code) {
     const url = `${apiUrl}?crtfc_key=${apiKey}&corp_code=${company.corpCode}&bsns_year=${bsnsYear}&reprt_code=${reprtCode}`;
@@ -58,16 +60,16 @@ async function fetchFinancialData() {
           corp_code: company.corpCode,
           stock_code: company.stockCode,
           corp_name: company.corpName,
-          cur_ratio: curRatio,
-          debt_eq_ratio: debtEqRatio,
-          sales_growth_rate: salesGrowthRate,
-          op_income_growth_rate: opIncomeGrowthRate,
-          op_profit_margin: opProfitMargin,
-          roa: roa,
-          roe: roe,
-          asset_turnover: assetTurnover,
-          debt_turnover: debtTurnover,
-          capital_turnover: capitalTurnover
+          cur_ratio: logTransform(curRatio),
+          debt_eq_ratio: logTransform(debtEqRatio),
+          sales_growth_rate: logTransform(salesGrowthRate),
+          op_income_growth_rate: logTransform(opIncomeGrowthRate),
+          op_profit_margin: logTransform(opProfitMargin),
+          roa: logTransform(roa),
+          roe: logTransform(roe),
+          asset_turnover: logTransform(assetTurnover),
+          debt_turnover: logTransform(debtTurnover),
+          capital_turnover: logTransform(capitalTurnover)
         };
 
         results.push(result);
@@ -80,6 +82,25 @@ async function fetchFinancialData() {
       break;  // 루프 중단
     }
   }
+
+  // 정규화할 컬럼들
+  const columnsToNormalize = [
+    'cur_ratio',
+    'debt_eq_ratio',
+    'sales_growth_rate',
+    'op_income_growth_rate',
+    'op_profit_margin',
+    'roa',
+    'roe',
+    'asset_turnover',
+    'debt_turnover',
+    'capital_turnover'
+  ];
+
+  // 각 컬럼 정규화
+  columnsToNormalize.forEach(column => {
+    results = normalizeData(results, column);
+  });
 
   // CSV 파일로 저장
   const fields = [
