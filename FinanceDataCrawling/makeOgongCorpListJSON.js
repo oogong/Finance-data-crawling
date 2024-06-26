@@ -6,7 +6,7 @@ const xml2js = require('xml2js');
 // 파일 경로
 const kospiListPath = './kospi200list.json';
 const xmlFilePath = './CORPCODE.xml';
-const outputFilePath = './kospi200Code.json';
+const outputFilePath = './ogongCorpList.json';
 
 // JSON 파일 읽기
 const kospiList = JSON.parse(fs.readFileSync(kospiListPath, 'utf-8'));
