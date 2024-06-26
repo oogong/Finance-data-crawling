@@ -46,8 +46,6 @@ async function generateOTP() {
 
   try {
     const response = await axios.post(url, data, { headers: headers });
-    console.log('OTP response headers:', response.headers); // 디버그를 위해 OTP 응답 헤더 로그 출력
-    console.log('OTP response data:', response.data); // 디버그를 위해 OTP 응답 로그 출력
     return response.data;
   } catch (error) {
     handleError(error);
